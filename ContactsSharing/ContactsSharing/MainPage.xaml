@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="ContactsSharing.MainPage"
+             x:Name="this">
+    <Grid CompressedLayout.IsHeadless="True">
+        <StackLayout>
+            <!-- Place new controls here -->
+            <Label Text="vCard Utility" 
+                   FontSize="Title"
+                   HorizontalOptions="Center"
+                   VerticalOptions="CenterAndExpand" />
+
+            <StackLayout Orientation="Horizontal">
+                <CheckBox CheckedChanged="TransliterateChanged"/>
+                <Label Text="Enable transliterate cyrillic"
+                       VerticalTextAlignment="Center"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <CheckBox CheckedChanged="OnEncodeQuotedChanged"/>
+                <Label Text="Enable encoding quoted printable"
+                       VerticalTextAlignment="Center"/>
+            </StackLayout>
+            <StackLayout Orientation="Horizontal">
+                <CheckBox x:Name="IsCustom"
+                          CheckedChanged="OnIsCusomtMimeChanged"/>
+                <Label Text="Custom mime type"
+                       VerticalTextAlignment="Center"/>
+            </StackLayout>
+            <Entry Placeholder="Mime type"
+                   Text="text/vcard"
+                   TextChanged="OnMimeTextChanged"
+                   IsEnabled="{Binding Source={x:Reference IsCustom}, Path=IsChecked}"/>
+            <Button Text="Load contacts"
+                    Clicked="OnLoadContacts"/>
+            <Label HorizontalTextAlignment="Center"
+                   FontSize="Micro"
+                   Margin="0,0,0,10">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="420-Solutions"/>
+                        <Span Text="{x:Static x:Environment.NewLine}"/>
+                        <Span Text=" Ver: "/>
+                        <Span Text=""
+                              x:Name="VersionSpan"/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+        </StackLayout>
+        <ActivityIndicator IsRunning="{Binding Source={x:Reference this}, Path=IsBusy}"
+                           IsVisible="{Binding Source={x:Reference this}, Path=IsBusy}"
+                           VerticalOptions="Start"
+                           HorizontalOptions="End"
+                           HeightRequest="35"
+                           WidthRequest="35"
+                           Margin="15"/>
+    </Grid>
+</ContentPage>
