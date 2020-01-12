@@ -8,52 +8,54 @@
              x:Name="this"
              Visual="Material">
     <Grid CompressedLayout.IsHeadless="True">
-        <StackLayout Padding="15">
-            <!-- Place new controls here -->
-            <Label Text="vCard Utility" 
-                   FontSize="Title"
-                   FontAttributes="Bold"
-                   HorizontalTextAlignment="Center"
-                   VerticalOptions="CenterAndExpand" />
+        <ScrollView>
+            <StackLayout Padding="15">
+                <!-- Place new controls here -->
+                <Label Text="vCard Utility" 
+                       FontSize="Title"
+                       FontAttributes="Bold"
+                       HorizontalTextAlignment="Center"
+                       VerticalOptions="CenterAndExpand" />
 
-            <StackLayout Orientation="Horizontal"
-                         Spacing="0">
-                <CheckBox CheckedChanged="TransliterateChanged"/>
-                <Label Text="Enable transliterate cyrillic"
-                       VerticalTextAlignment="Center"/>
+                <StackLayout Orientation="Horizontal"
+                             Spacing="0">
+                    <CheckBox CheckedChanged="TransliterateChanged"/>
+                    <Label Text="Enable transliterate cyrillic"
+                           VerticalTextAlignment="Center"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal"
+                             Spacing="0">
+                    <CheckBox CheckedChanged="OnEncodeQuotedChanged"/>
+                    <Label Text="Enable encoding quoted printable"
+                           VerticalTextAlignment="Center"/>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal"
+                             Spacing="0">
+                    <CheckBox x:Name="IsCustom"
+                              CheckedChanged="OnIsCusomtMimeChanged"/>
+                    <Label Text="Custom mime type"
+                           VerticalTextAlignment="Center"/>
+                </StackLayout>
+                <Entry Placeholder="Mime type"
+                       Text="text/vcard"
+                       TextChanged="OnMimeTextChanged"
+                       IsEnabled="{Binding Source={x:Reference IsCustom}, Path=IsChecked}"/>
+                <Button Text="Load contacts"
+                        Clicked="OnLoadContacts"/>
+                <Label HorizontalTextAlignment="Center"
+                       FontSize="Small">
+                    <Label.FormattedText>
+                        <FormattedString>
+                            <Span Text="420-Solutions"/>
+                            <Span Text="{x:Static x:Environment.NewLine}"/>
+                            <Span Text=" Ver: "/>
+                            <Span Text=""
+                                  x:Name="VersionSpan"/>
+                        </FormattedString>
+                    </Label.FormattedText>
+                </Label>
             </StackLayout>
-            <StackLayout Orientation="Horizontal"
-                         Spacing="0">
-                <CheckBox CheckedChanged="OnEncodeQuotedChanged"/>
-                <Label Text="Enable encoding quoted printable"
-                       VerticalTextAlignment="Center"/>
-            </StackLayout>
-            <StackLayout Orientation="Horizontal"
-                         Spacing="0">
-                <CheckBox x:Name="IsCustom"
-                          CheckedChanged="OnIsCusomtMimeChanged"/>
-                <Label Text="Custom mime type"
-                       VerticalTextAlignment="Center"/>
-            </StackLayout>
-            <Entry Placeholder="Mime type"
-                   Text="text/vcard"
-                   TextChanged="OnMimeTextChanged"
-                   IsEnabled="{Binding Source={x:Reference IsCustom}, Path=IsChecked}"/>
-            <Button Text="Load contacts"
-                    Clicked="OnLoadContacts"/>
-            <Label HorizontalTextAlignment="Center"
-                   FontSize="Small">
-                <Label.FormattedText>
-                    <FormattedString>
-                        <Span Text="420-Solutions"/>
-                        <Span Text="{x:Static x:Environment.NewLine}"/>
-                        <Span Text=" Ver: "/>
-                        <Span Text=""
-                              x:Name="VersionSpan"/>
-                    </FormattedString>
-                </Label.FormattedText>
-            </Label>
-        </StackLayout>
+        </ScrollView>
         <ActivityIndicator IsRunning="{Binding Source={x:Reference this}, Path=IsBusy}"
                            IsVisible="{Binding Source={x:Reference this}, Path=IsBusy}"
                            VerticalOptions="Start"
