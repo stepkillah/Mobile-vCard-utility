@@ -6,6 +6,15 @@
              mc:Ignorable="d"
              x:Class="ContactsSharing.App">
     <Application.Resources>
-
+        <ResourceDictionary>
+            <Style TargetType="CheckBox">
+                <Setter Property="Color"
+                        Value="Accent"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor"
+                        Value="Accent"/>
+            </Style>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

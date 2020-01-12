@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Foundation;
+﻿using Foundation;
 using Plugin.ContactService;
 using UIKit;
 using Xamarin.Forms;
@@ -24,7 +20,8 @@ namespace ContactsSharing.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
-            global::Xamarin.Forms.Forms.Init();
+            Forms.Init();
+            FormsMaterial.Init();
             LoadApplication(new App());
             DependencyService.Register<IContactService, ContactServiceImplementation>();
             return base.FinishedLaunching(app, options);

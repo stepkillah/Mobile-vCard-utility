@@ -5,26 +5,31 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="ContactsSharing.MainPage"
-             x:Name="this">
+             x:Name="this"
+             Visual="Material">
     <Grid CompressedLayout.IsHeadless="True">
-        <StackLayout>
+        <StackLayout Padding="15">
             <!-- Place new controls here -->
             <Label Text="vCard Utility" 
                    FontSize="Title"
-                   HorizontalOptions="Center"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
                    VerticalOptions="CenterAndExpand" />
 
-            <StackLayout Orientation="Horizontal">
+            <StackLayout Orientation="Horizontal"
+                         Spacing="0">
                 <CheckBox CheckedChanged="TransliterateChanged"/>
                 <Label Text="Enable transliterate cyrillic"
                        VerticalTextAlignment="Center"/>
             </StackLayout>
-            <StackLayout Orientation="Horizontal">
+            <StackLayout Orientation="Horizontal"
+                         Spacing="0">
                 <CheckBox CheckedChanged="OnEncodeQuotedChanged"/>
                 <Label Text="Enable encoding quoted printable"
                        VerticalTextAlignment="Center"/>
             </StackLayout>
-            <StackLayout Orientation="Horizontal">
+            <StackLayout Orientation="Horizontal"
+                         Spacing="0">
                 <CheckBox x:Name="IsCustom"
                           CheckedChanged="OnIsCusomtMimeChanged"/>
                 <Label Text="Custom mime type"
@@ -37,8 +42,7 @@
             <Button Text="Load contacts"
                     Clicked="OnLoadContacts"/>
             <Label HorizontalTextAlignment="Center"
-                   FontSize="Micro"
-                   Margin="0,0,0,10">
+                   FontSize="Small">
                 <Label.FormattedText>
                     <FormattedString>
                         <Span Text="420-Solutions"/>
