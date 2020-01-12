@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
+using Plugin.ContactService;
 using UIKit;
+using Xamarin.Forms;
 
 namespace ContactsSharing.iOS
 {
@@ -24,7 +26,7 @@ namespace ContactsSharing.iOS
         {
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App());
-
+            DependencyService.Register<IContactService, ContactServiceImplementation>();
             return base.FinishedLaunching(app, options);
         }
     }

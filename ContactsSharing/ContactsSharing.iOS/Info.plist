@@ -34,5 +34,7 @@
     <string>ContactsSharing</string>
     <key>XSAppIconAssets</key>
     <string>Assets.xcassets/AppIcon.appiconset</string>
+    <key>NSContactsUsageDescription</key>
+    <string>We need contact permission to be able to export contacts.</string>
 </dict>
 </plist>
