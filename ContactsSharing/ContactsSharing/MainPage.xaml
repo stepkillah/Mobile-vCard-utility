@@ -5,63 +5,143 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d"
              x:Class="ContactsSharing.MainPage"
-             x:Name="this"
+             xmlns:models="clr-namespace:ContactsSharing.Models;assembly=ContactsSharing"
+             xmlns:viewModels="clr-namespace:ContactsSharing.ViewModels;assembly=ContactsSharing"
+             xmlns:converter="clr-namespace:ContactsSharing.Converter;assembly=ContactsSharing"
+             x:DataType="viewModels:MainPageViewModel"
              Visual="Material">
-    <Grid CompressedLayout.IsHeadless="True">
-        <ScrollView>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converter:InverseBooleanConverter x:Key="BooleanConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+
+        <SearchBar Text="{Binding SearchText}"
+                       BackgroundColor="Accent"/>
+
+        <CollectionView ItemSizingStrategy="MeasureFirstItem"
+                        ItemsSource="{Binding Contacts}"
+                        Grid.Row="1"
+                        Margin="15,0">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ContactViewModel">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Text="{Binding Name}"
+                               VerticalTextAlignment="Center"
+                               Margin="0,0,75,0"
+                               Grid.Column="0"/>
+                        <Button Grid.Column="1"
+                                Text="Trans"
+                                TextColor="White"
+                                WidthRequest="50"
+                                HeightRequest="20"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center"
+                                FontSize="Micro"
+                                Padding="3"
+                                Command="{Binding TransliterateCommand}">
+                            <Button.Triggers>
+                                <DataTrigger TargetType="Button"
+                                             Binding="{Binding Transliterated}"
+                                             Value="True">
+                                    <Setter Property="Text"
+                                            Value="Normal"/>
+                                </DataTrigger>
+                            </Button.Triggers>
+                        </Button>
+                        <CheckBox IsChecked="{Binding IsSelected}"
+                                  VerticalOptions="Center"
+                                  HorizontalOptions="End"
+                                  Grid.Column="2"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Button Text="Settings"
+                Command="{Binding SettingsCommand}"
+                Grid.Row="2"
+                Margin="15,0"
+                IsVisible="{Binding SettingsShown, Converter={StaticResource BooleanConverter}}"/>
+        <Button Text="Create and share vCard"
+                Command="{Binding ShareCommand}"
+                Grid.Row="3"
+                Margin="15,0"
+                IsVisible="{Binding SettingsShown, Converter={StaticResource BooleanConverter}}"/>
+
+        <Label HorizontalTextAlignment="Center"
+               FontSize="Small"
+               Grid.Row="4"
+               Margin="15,0">
+            <Label.FormattedText>
+                <FormattedString>
+                    <Span Text="420-Solutions"/>
+                    <Span Text="{x:Static x:Environment.NewLine}"/>
+                    <Span Text=" Ver: "/>
+                    <Span Text="{Binding AppVersion}"/>
+                </FormattedString>
+            </Label.FormattedText>
+        </Label>
+        <ScrollView Grid.Row="0"
+                    Grid.RowSpan="4"
+                    IsVisible="{Binding SettingsShown}"
+                    BackgroundColor="White"
+                    Margin="15,0">
             <StackLayout Padding="15">
-                <!-- Place new controls here -->
                 <Label Text="vCard Utility" 
                        FontSize="Title"
                        FontAttributes="Bold"
                        HorizontalTextAlignment="Center"
                        VerticalOptions="CenterAndExpand" />
-
                 <StackLayout Orientation="Horizontal"
                              Spacing="0">
-                    <CheckBox CheckedChanged="TransliterateChanged"/>
+                    <CheckBox IsChecked="{Binding Transliteration}"/>
                     <Label Text="Enable transliterate cyrillic"
                            VerticalTextAlignment="Center"/>
                 </StackLayout>
                 <StackLayout Orientation="Horizontal"
                              Spacing="0">
-                    <CheckBox CheckedChanged="OnEncodeQuotedChanged"/>
+                    <CheckBox IsChecked="{Binding EncodeQuotedPrintable}"/>
                     <Label Text="Enable encoding quoted printable"
                            VerticalTextAlignment="Center"/>
                 </StackLayout>
                 <StackLayout Orientation="Horizontal"
                              Spacing="0">
-                    <CheckBox x:Name="IsCustom"
-                              CheckedChanged="OnIsCusomtMimeChanged"/>
+                    <CheckBox IsChecked="{Binding CustomMime}"/>
                     <Label Text="Custom mime type"
                            VerticalTextAlignment="Center"/>
                 </StackLayout>
                 <Entry Placeholder="Mime type"
-                       Text="text/vcard"
-                       TextChanged="OnMimeTextChanged"
-                       IsEnabled="{Binding Source={x:Reference IsCustom}, Path=IsChecked}"/>
-                <Button Text="Load contacts"
-                        Clicked="OnLoadContacts"/>
-                <Label HorizontalTextAlignment="Center"
-                       FontSize="Small">
-                    <Label.FormattedText>
-                        <FormattedString>
-                            <Span Text="420-Solutions"/>
-                            <Span Text="{x:Static x:Environment.NewLine}"/>
-                            <Span Text=" Ver: "/>
-                            <Span Text=""
-                                  x:Name="VersionSpan"/>
-                        </FormattedString>
-                    </Label.FormattedText>
-                </Label>
+                       Text="{Binding MimeType}"
+                       IsEnabled="{Binding CustomMime}"/>
+                <Button Text="Close"
+                        Command="{Binding SettingsCommand}"/>
             </StackLayout>
         </ScrollView>
-        <ActivityIndicator IsRunning="{Binding Source={x:Reference this}, Path=IsBusy}"
-                           IsVisible="{Binding Source={x:Reference this}, Path=IsBusy}"
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="Accent"
                            VerticalOptions="Start"
                            HorizontalOptions="End"
                            HeightRequest="35"
                            WidthRequest="35"
-                           Margin="15"/>
+                           Margin="15"
+                           Grid.Row="0"
+                           Grid.RowSpan="5"/>
     </Grid>
 </ContentPage>
