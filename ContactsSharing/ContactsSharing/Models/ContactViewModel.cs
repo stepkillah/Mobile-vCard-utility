@@ -8,12 +8,12 @@ namespace ContactsSharing.Models
 {
     public class ContactViewModel : INotifyPropertyChanged
     {
-        private readonly string _originalName;
+        public readonly string OriginalName;
 
         public ContactViewModel(Contact contact)
         {
             Contact = contact;
-            _originalName = contact.Name;
+            OriginalName = contact.Name;
             Name = contact.Name;
         }
         public ContactViewModel()
@@ -70,7 +70,7 @@ namespace ContactsSharing.Models
         private void OnTransliterate()
         {
             Transliterated = !Transliterated;
-            Name = Transliterated ? Transliteration.CyrillicToLatin(Contact.Name, Language.Russian) : _originalName;
+            Name = Transliterated ? Transliteration.CyrillicToLatin(Contact.Name, Language.Russian) : OriginalName;
         }
 
 

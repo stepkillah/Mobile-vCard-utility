@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using ContactsSharing.Models;
 using NickBuhro.Translit;
@@ -133,9 +134,60 @@ namespace ContactsSharing.ViewModels
             }
         }
 
+
+        private bool _isAllSelected = true;
+        public bool IsAllSelected
+        {
+            get => _isAllSelected;
+            set
+            {
+                _isAllSelected = value;
+                OnPropertyChanged();
+                HandleIsAllSelected();
+            }
+        }
+
+        private bool _isAllTransliterated;
+        public bool IsAllTransliterated
+        {
+            get => _isAllTransliterated;
+            set
+            {
+                _isAllTransliterated = value;
+                OnPropertyChanged();
+
+            }
+        }
+
+        private void HandleIsAllSelected()
+        {
+            if (Contacts == null) return;
+            foreach (ContactViewModel contact in Contacts)
+            {
+                contact.IsSelected = IsAllSelected;
+            }
+        }
         #endregion
 
         #region commands
+
+        private Command _globalTransliterateCommand;
+
+        public Command GlobalTransliterateCommand => _globalTransliterateCommand ??= new Command(OnGlobalTransliterate, () => !IsBusy);
+        private void OnGlobalTransliterate()
+        {
+
+            IsAllTransliterated = !IsAllTransliterated;
+            if (Contacts == null) return;
+            foreach (ContactViewModel contact in Contacts)
+            {
+                contact.Transliterated = IsAllTransliterated;
+                contact.Name = contact.Transliterated ? NickBuhro.Translit.Transliteration.CyrillicToLatin(contact.Name, Language.Russian) : contact.OriginalName;
+            }
+        }
+
+
+
 
         private Command _shareCommand;
         public Command ShareCommand => _shareCommand ??= new Command(OnShare, () => !IsBusy);
@@ -153,36 +205,31 @@ namespace ContactsSharing.ViewModels
                     return;
                 var result = await Application.Current.MainPage.DisplayAlert("Contacts loaded", $"Total count: {contacts.Count}", "OK",
                     "Cancel");
-                if (result)
+                if (!result) return;
+
+                var builder = new StringBuilder();
+                foreach (var contact in contacts)
                 {
-                    var builder = new StringBuilder();
-                    foreach (var contact in contacts)
-                    {
-                        await GetVCard(builder, contact.Contact);
-                    }
+                    await GetVCard(builder, contact.Contact);
+                }
 
-                    if (File.Exists(ContactsFilePath))
-                        File.Delete(ContactsFilePath);
-                    using (var file = File.Create(ContactsFilePath))
-                    {
-                        using (var writer = new StreamWriter(file))
-                        {
-                            await writer.WriteAsync(builder.ToString());
-                        }
-                    }
+                if (File.Exists(ContactsFilePath))
+                    File.Delete(ContactsFilePath);
+                await using (var file = File.Create(ContactsFilePath))
+                {
+                    await using var writer = new StreamWriter(file);
+                    await writer.WriteAsync(builder.ToString());
+                }
 
-                    if (CustomMime && !string.IsNullOrEmpty(_mimeType))
-                    {
-                        await Share.RequestAsync(new ShareFileRequest("Contacts",
-                            new ShareFile(ContactsFilePath, _mimeType)));
-                    }
-                    else
-                    {
-                        await Share.RequestAsync(new ShareFileRequest("Contacts",
-                            new ShareFile(ContactsFilePath)));
-                    }
-
-
+                if (CustomMime && !string.IsNullOrEmpty(_mimeType))
+                {
+                    await Share.RequestAsync(new ShareFileRequest("Contacts",
+                        new ShareFile(ContactsFilePath, _mimeType)));
+                }
+                else
+                {
+                    await Share.RequestAsync(new ShareFileRequest("Contacts",
+                        new ShareFile(ContactsFilePath)));
                 }
 
             }
@@ -300,24 +347,24 @@ namespace ContactsSharing.ViewModels
 
         private async Task<IList<Contact>> GetContacts()
         {
-            var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Contacts);
-            if (status != PermissionStatus.Granted)
+            var status = await CrossPermissions.Current.CheckPermissionStatusAsync<ContactsPermission>();
+            if (status != Plugin.Permissions.Abstractions.PermissionStatus.Granted)
             {
                 if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Contacts))
                 {
                     await Application.Current.MainPage.DisplayAlert("Need Contacts", "Gunna need that Contacts", "OK");
                 }
 
-                var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Contacts);
-                status = results[Permission.Contacts];
+                var results = await CrossPermissions.Current.RequestPermissionAsync<ContactsPermission>();
+                status = results;
             }
 
-            if (status == PermissionStatus.Granted)
+            if (status == Plugin.Permissions.Abstractions.PermissionStatus.Granted)
             {
                 return await DependencyService.Get<IContactService>().GetContactListAsync();
             }
 
-            if (status != PermissionStatus.Unknown)
+            if (status != Plugin.Permissions.Abstractions.PermissionStatus.Unknown)
             {
                 await Application.Current.MainPage.DisplayAlert("Contacts Denied", "Can not continue, try again.", "OK");
             }
@@ -325,13 +372,31 @@ namespace ContactsSharing.ViewModels
             return null;
         }
 
-        private void OnTextChanged()
+        private bool _isTextChanging;
+        private CancellationTokenSource _cts = new CancellationTokenSource();
+        private async void OnTextChanged()
         {
-            if (_initialData == null)
-                return;
-            Contacts = !string.IsNullOrEmpty(SearchText)
-                ? new ObservableCollection<ContactViewModel>(_initialData.Where(d => d.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)).OrderBy(d => d.Name).Select(d => new ContactViewModel(d) { IsSelected = true }))
-                : new ObservableCollection<ContactViewModel>(_initialData.OrderBy(d => d.Name).Select(d => new ContactViewModel(d) { IsSelected = true }));
+            try
+            {
+                if (_isTextChanging)
+                {
+                    _cts.Cancel();
+                    _cts.Dispose();
+                    _cts = new CancellationTokenSource();
+                }
+                _isTextChanging = true;
+                await Task.Delay(700, _cts.Token);
+                if (_initialData == null)
+                    return;
+                Contacts = !string.IsNullOrEmpty(SearchText)
+                    ? new ObservableCollection<ContactViewModel>(_initialData.Where(d => d.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)).OrderBy(d => d.Name).Select(d => new ContactViewModel(d) { IsSelected = true }))
+                    : new ObservableCollection<ContactViewModel>(_initialData.OrderBy(d => d.Name).Select(d => new ContactViewModel(d) { IsSelected = true }));
+            }
+            catch (OperationCanceledException) { }
+            finally
+            {
+                _isTextChanging = false;
+            }
         }
 
         #endregion
