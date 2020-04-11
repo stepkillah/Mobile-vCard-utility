@@ -47,7 +47,7 @@
                Margin="15,0,15,0"
                Grid.Column="0"
                Grid.Row="1"/>
-        <Button Grid.Column="1"
+        <!--<Button Grid.Column="1"
                 Grid.Row="1"
                 Text="Trans"
                 TextColor="White"
@@ -67,7 +67,7 @@
                             Value="Normal"/>
                 </DataTrigger>
             </Button.Triggers>
-        </Button>
+        </Button>-->
         <CheckBox IsChecked="{Binding IsAllSelected}"
                   VerticalOptions="Center"
                   HorizontalOptions="End"
@@ -94,7 +94,7 @@
                                Margin="0,0,75,0"
                                Grid.Column="0"/>
                         <Button Grid.Column="1"
-                                Text="Trans"
+                                Text="Action"
                                 TextColor="White"
                                 WidthRequest="50"
                                 HeightRequest="20"
@@ -102,16 +102,7 @@
                                 HorizontalOptions="Center"
                                 FontSize="Micro"
                                 Padding="3"
-                                Command="{Binding TransliterateCommand}">
-                            <Button.Triggers>
-                                <DataTrigger TargetType="Button"
-                                             Binding="{Binding Transliterated}"
-                                             Value="True">
-                                    <Setter Property="Text"
-                                            Value="Normal"/>
-                                </DataTrigger>
-                            </Button.Triggers>
-                        </Button>
+                                Command="{Binding ActionCommand}"/>
                         <CheckBox IsChecked="{Binding IsSelected}"
                                   VerticalOptions="Center"
                                   HorizontalOptions="End"

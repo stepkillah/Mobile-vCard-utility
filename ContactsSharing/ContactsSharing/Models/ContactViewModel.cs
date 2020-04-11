@@ -64,15 +64,32 @@ namespace ContactsSharing.Models
                 OnPropertyChanged();
             }
         }
-        private Command _transliterateCommand;
 
-        public Command TransliterateCommand => _transliterateCommand ??= new Command(OnTransliterate);
-        private void OnTransliterate()
+        private Command _actionCommand;
+
+        public Command ActionCommand => _actionCommand ??= new Command(OnAction);
+
+        private async void OnAction()
         {
-            Transliterated = !Transliterated;
-            Name = Transliterated ? Transliteration.CyrillicToLatin(Contact.Name, Language.Russian) : OriginalName;
+            var action = await Application.Current.MainPage.DisplayActionSheet("Select action", "Cancel", null, "Transliterate",
+                    "Edit", "Reset");
+            switch (action)
+            {
+                case "Transliterate":
+                    Transliterated = !Transliterated;
+                    Name = Transliterated ? Transliteration.CyrillicToLatin(Contact.Name, Language.Russian) : OriginalName;
+                    break;
+                case "Edit":
+                    var newName = await Application.Current.MainPage.DisplayPromptAsync("Warning", "Enter new name", initialValue: Name);
+                    if (!string.IsNullOrEmpty(newName))
+                        Name = newName;
+                    break;
+                case "Reset":
+                    Transliterated = false;
+                    Name = OriginalName;
+                    break;
+            }
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
