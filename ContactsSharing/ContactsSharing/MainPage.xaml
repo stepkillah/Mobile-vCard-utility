@@ -101,7 +101,7 @@
                                 VerticalOptions="Center"
                                 HorizontalOptions="Center"
                                 FontSize="Micro"
-                                Padding="3"
+                                Padding="-15"
                                 Command="{Binding ActionCommand}"/>
                         <CheckBox IsChecked="{Binding IsSelected}"
                                   VerticalOptions="Center"

@@ -13,8 +13,6 @@ using ContactsSharing.Models;
 using NickBuhro.Translit;
 using Plugin.ContactService;
 using Plugin.ContactService.Shared;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -347,27 +345,20 @@ namespace ContactsSharing.ViewModels
 
         private async Task<IList<Contact>> GetContacts()
         {
-            var status = await CrossPermissions.Current.CheckPermissionStatusAsync<ContactsPermission>();
-            if (status != Plugin.Permissions.Abstractions.PermissionStatus.Granted)
+            var status = await Permissions.CheckStatusAsync<Permissions.ContactsRead>();
+            if (status != PermissionStatus.Granted)
             {
-                if (await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Contacts))
-                {
-                    await Application.Current.MainPage.DisplayAlert("Need Contacts", "Gunna need that Contacts", "OK");
-                }
 
-                var results = await CrossPermissions.Current.RequestPermissionAsync<ContactsPermission>();
+                var results = await Permissions.RequestAsync<Permissions.ContactsRead>();
                 status = results;
             }
 
-            if (status == Plugin.Permissions.Abstractions.PermissionStatus.Granted)
-            {
+            if (status == PermissionStatus.Granted)
                 return await DependencyService.Get<IContactService>().GetContactListAsync();
-            }
 
-            if (status != Plugin.Permissions.Abstractions.PermissionStatus.Unknown)
-            {
+            if (status != PermissionStatus.Unknown)
                 await Application.Current.MainPage.DisplayAlert("Contacts Denied", "Can not continue, try again.", "OK");
-            }
+
 
             return null;
         }

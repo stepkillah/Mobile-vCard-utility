@@ -49,14 +49,17 @@ namespace ContactsSharing.Droid.Services
         }
 
 
-        public Task<IList<Contact>> GetContactListAsync() => Task.Run(() => GetContactList());
+        public Task<IList<Contact>> GetContactListAsync() => Task.Run(GetContactList);
 
         private IEnumerable<Contact> GetContacts(Func<Contact, bool> filter = null)
         {
             var uri = ContactsContract.CommonDataKinds.Contactables.ContentUri;
+            if (uri == null)
+                return null;
             var ctx = Application.Context;
-
-            var cursor = ctx.ApplicationContext.ContentResolver.Query(uri, Projection, Selection, SelectionArgs, SortOrder);
+            var cursor = ctx.ApplicationContext?.ContentResolver?.Query(uri, Projection, Selection, SelectionArgs, SortOrder);
+            if (cursor == null)
+                return null;
             if (cursor.Count == 0) return null;
             _nameIndex = cursor.GetColumnIndex(ContactsContract.Contacts.InterfaceConsts.DisplayName);
             _photoUriIndex = cursor.GetColumnIndex(ContactsContract.Contacts.InterfaceConsts.PhotoUri);
