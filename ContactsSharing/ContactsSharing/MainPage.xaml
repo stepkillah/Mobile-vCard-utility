@@ -147,38 +147,39 @@
                     Grid.Column="0"
                     Grid.ColumnSpan="3"
                     IsVisible="{Binding SettingsShown}"
-                    BackgroundColor="White"
                     Margin="15,0">
-            <StackLayout Padding="15">
-                <Label Text="vCard Utility" 
-                       FontSize="Title"
-                       FontAttributes="Bold"
-                       HorizontalTextAlignment="Center"
-                       VerticalOptions="CenterAndExpand" />
-                <StackLayout Orientation="Horizontal"
-                             Spacing="0">
-                    <CheckBox IsChecked="{Binding Transliteration}"/>
-                    <Label Text="Enable transliterate cyrillic"
+            <Frame>
+                <StackLayout Padding="15">
+                    <Label Text="vCard Utility" 
+                           FontSize="Title"
+                           FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           VerticalOptions="CenterAndExpand" />
+                    <StackLayout Orientation="Horizontal"
+                                 Spacing="0">
+                        <CheckBox IsChecked="{Binding Transliteration}"/>
+                        <Label Text="Enable transliterate cyrillic"
                            VerticalTextAlignment="Center"/>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal"
+                                 Spacing="0">
+                        <CheckBox IsChecked="{Binding EncodeQuotedPrintable}"/>
+                        <Label Text="Enable encoding quoted printable"
+                               VerticalTextAlignment="Center"/>
+                    </StackLayout>
+                    <StackLayout Orientation="Horizontal"
+                                 Spacing="0">
+                        <CheckBox IsChecked="{Binding CustomMime}"/>
+                        <Label Text="Custom mime type"
+                               VerticalTextAlignment="Center"/>
+                    </StackLayout>
+                    <Entry Placeholder="Mime type"
+                           Text="{Binding MimeType}"
+                           IsEnabled="{Binding CustomMime}"/>
+                    <Button Text="Close"
+                            Command="{Binding SettingsCommand}"/>
                 </StackLayout>
-                <StackLayout Orientation="Horizontal"
-                             Spacing="0">
-                    <CheckBox IsChecked="{Binding EncodeQuotedPrintable}"/>
-                    <Label Text="Enable encoding quoted printable"
-                           VerticalTextAlignment="Center"/>
-                </StackLayout>
-                <StackLayout Orientation="Horizontal"
-                             Spacing="0">
-                    <CheckBox IsChecked="{Binding CustomMime}"/>
-                    <Label Text="Custom mime type"
-                           VerticalTextAlignment="Center"/>
-                </StackLayout>
-                <Entry Placeholder="Mime type"
-                       Text="{Binding MimeType}"
-                       IsEnabled="{Binding CustomMime}"/>
-                <Button Text="Close"
-                        Command="{Binding SettingsCommand}"/>
-            </StackLayout>
+            </Frame>
         </ScrollView>
 
         <ActivityIndicator IsRunning="{Binding IsBusy}"
